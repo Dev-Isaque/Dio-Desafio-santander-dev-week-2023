@@ -7,29 +7,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import me.dio.service.exception.BusinessException;
-import me.dio.service.exception.NotFoundException;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final Logger logger  = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleBusinessException(BusinessException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleBusinessException(IllegalArgumentException businessException) {
+        return new ResponseEntity<>(businessException.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNoContentException() {
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNotFoundException(NoSuchElementException notFoundException) {
         return new ResponseEntity<>("Resource ID not found.", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<String> handleUnexpectedException(Throwable unexpectedException) {
-        String message = "Unexpected server error.";
-        LOGGER.error(message, unexpectedException);
+        var message = "Unexpected server error, see the logs.";
+        logger.error(message, unexpectedException);
         return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-
